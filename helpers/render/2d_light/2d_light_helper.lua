@@ -21,7 +21,7 @@ local function init_render_targets(self,size)
 	self.light_map_target=render.render_target("light_map_target", {[render.BUFFER_COLOR_BIT] = color_params})
 
 	local shadow_color_params = {
-    format = render.FORMAT_RGBA,
+    format = render.FORMAT_RGB,
   	width = size,
   	height = 1,
   	min_filter = render.FILTER_LINEAR,
@@ -31,9 +31,10 @@ local function init_render_targets(self,size)
 	self.shadow_map_target=render.render_target("shadow_map_target", {[render.BUFFER_COLOR_BIT] = shadow_color_params})
 end
 
---soft shadows is number from 0 to 1
+--you can enable soft shadows in light_map.fp
 --light_size is number of rays per light source
-function M.new(light_size, additive, soft_shadows)
+--need to set light_size here and in shader
+function M.new(light_size, additive)
 	local self = setmetatable({},M)
 	self.screen_helper=Screen_helper:new()
 	self.light_size=light_size
@@ -59,8 +60,6 @@ end
 
 --maybe use one big occlusion_target
 local function draw_occlusion(self,light)
-	--render.set_viewport(0, 0, self.light_size, self.light_size)
-	--render.set_projection(vmath.matrix4_orthographic(-self.light_size/2+light.position.x, self.light_size/2+light.position.x, -self.light_size/2+light.position.y, self.light_size/2+light.position.y, -1, 1))
 	render.enable_render_target(self.occlusion_map_target)
 	render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
 	render.draw(self.block_light_pred)
@@ -68,13 +67,10 @@ local function draw_occlusion(self,light)
 	--self.screen_helper:draw_in(self.occlusion_map_target,600,0,256,256)
 end
 
---THE BOTTLENECK HERE
 local function draw_shadow_map(self,light)
-	render.set_viewport(0, 0, self.light_size, self.light_size)
-	self.projection=vmath.matrix4_orthographic(0,0.02,0,0.02,-1,1)
-	render.set_projection(self.projection)
+	render.set_viewport(0, 0, self.light_size, 1)
+	render.set_projection(vmath.matrix4_orthographic(0,0.02,0,0.02,-1,1))
 	render.enable_render_target(self.shadow_map_target)
-	--render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
 	render.enable_material("2d_light_shadow")
 	render.enable_texture(0,self.occlusion_map_target, render.BUFFER_COLOR_BIT)
 	render.draw(self.pred,light.const)
@@ -85,8 +81,6 @@ local function draw_shadow_map(self,light)
 end
 
 local function draw_light_map(self,light)
-	enable_blend(self)
-
 	local width=render.get_width()
 	local height=render.get_height()
 	local width_scale = width/self.light_size/light.scale
@@ -118,6 +112,7 @@ end
 
 function M:draw()
 	draw_occlusion(self)
+	enable_blend(self)
 	for key,light in pairs(self.lights) do
 		draw_light(self,light)
 	end
