@@ -1,0 +1,20 @@
+go.property("color",vmath.vector4(1,1,1,1))
+go.property("start_light_id",1)
+
+local update_pos_hash= hash("update_pos")
+local create_new_light_hash= hash("create_new_light")
+function init(self)
+    msg.post("@render:","add_light",{light_id=self.start_light_id,color=self.color,size=self.size,position=go.get_position()})
+end
+
+function on_message(self, message_id, message)
+    if message_id == update_pos_hash then
+      msg.post("@render:","add_light",{light_id=self.start_light_id,color=self.color,size=self.size,position=go.get_position()})
+    elseif message_id == create_new_light_hash then
+      msg.post("@render:","add_light",{light_id=self.start_light_id,color=self.color,size=self.size,position=go.get_position()})
+    	self.start_light_id=self.start_light_id+1
+    	self.color=vmath.vector4(math.random(),math.random(),math.random(),math.random()*0.3+0.7)
+    	print(self.color)	
+    end
+end
+

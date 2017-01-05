@@ -1,0 +1,20 @@
+name: "1d"
+vertex_program: "/helpers/render/shaders/default.vp"
+fragment_program: "/helpers/render/2d_light/shadow_map/shadow.fp"
+vertex_constants {
+  name: "view_proj"
+  type: CONSTANT_TYPE_VIEWPROJ
+}
+vertex_constants {
+  name: "center"
+  type: CONSTANT_TYPE_USER
+}
+vertex_constants {
+  name: "pos_size"
+  type: CONSTANT_TYPE_USER
+}
+fragment_constants {
+  name: "resolution"
+  type: CONSTANT_TYPE_USER
+}
+textures: "TEX0"

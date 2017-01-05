@@ -1,0 +1,20 @@
+function init(self)
+  msg.post(".", "acquire_input_focus")
+  self.mpos_vec = vmath.vector3(0, 0, 0)
+end
+
+local touch_hash=hash("touch")
+local profiler_hash=hash("profiler")
+
+function on_input(self, action_id, action)
+	if(action.x~=nil) then
+  		go.set_position(vmath.vector3(action.x,action.y,1))
+  		msg.post("#light","update_pos")
+  	end	
+  	if(action_id==touch_hash and action.pressed==true) then
+  		msg.post("#light","create_new_light")
+  	elseif(action_id==profiler_hash and action.pressed) then
+  		msg.post("@system:", "toggle_profile")
+  	end	
+end
+

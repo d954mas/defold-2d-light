@@ -1,0 +1,16 @@
+key_trigger {
+  input: KEY_P
+  action: "profiler"
+}
+key_trigger {
+  input: KEY_A
+  action: "additive"
+}
+key_trigger {
+  input: KEY_S
+  action: "soft_shadow"
+}
+mouse_trigger {
+  input: MOUSE_BUTTON_LEFT
+  action: "touch"
+}

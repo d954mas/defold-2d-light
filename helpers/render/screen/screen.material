@@ -1,0 +1,9 @@
+name: "screen"
+tags: "screen"
+vertex_program: "/helpers/render/screen/screen.vp"
+fragment_program: "/helpers/render/screen/screen.fp"
+vertex_constants {
+  name: "view_proj"
+  type: CONSTANT_TYPE_VIEWPROJ
+}
+textures: "TEX0"
