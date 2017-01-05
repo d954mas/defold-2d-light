@@ -44,9 +44,7 @@ function M.new(light_size, additive, soft_shadows)
 	self.pred = render.predicate({"screen"})
 	init_render_targets(self,light_size)
 	self.clear_color=vmath.vector4(0,0,0,0)
-	self.shadow_map_constants = render.constant_buffer()
-    self.shadow_map_constants.resolution = vmath.vector4(light_size, light_size, 0, 0)
-  return self
+	return self
 end
 
 
@@ -71,18 +69,18 @@ local function draw_occlusion(self,light)
 end
 
 --THE BOTTLENECK HERE
-local function draw_shadow_map(self)
+local function draw_shadow_map(self,light)
 	self.projection=vmath.matrix4_orthographic(0,0.02,0,0.02,-1,1)
 	render.set_projection(self.projection)
 	render.enable_render_target(self.shadow_map_target)
-	render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
+	--render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
 	render.enable_material("2d_light_shadow")
 	render.enable_texture(0,self.occlusion_map_target, render.BUFFER_COLOR_BIT)
-	render.draw(self.pred,self.shadow_map_constants)
+	render.draw(self.pred,light.const)
 	render.disable_texture(0,self.occlusion_map_target)
 	render.disable_material("2d_light_shadow")
 	render.disable_render_target(self.shadow_map_target)
-	self.screen_helper:draw_in(self.shadow_map_target,0,0,256,256)
+	--self.screen_helper:draw_in(self.shadow_map_target,0,0,256,256)
 end
 
 local function draw_light_map(self,light)
@@ -90,8 +88,8 @@ local function draw_light_map(self,light)
 
 	local width=render.get_width()
 	local height=render.get_height()
-	local width_scale = width/self.light_size/2
-	local height_scale = height/self.light_size/2
+	local width_scale = width/self.light_size/light.scale
+	local height_scale = height/self.light_size/light.scale
 	render.set_viewport(0, 0, render.get_window_width(), render.get_height())
 	local x=0.01 * width_scale-light.position.x/width*0.02*width_scale + 0.01
 	local y=0.01 * height_scale-light.position.y/height*0.02*height_scale + 0.01
@@ -113,7 +111,7 @@ end
 
 local function draw_light(self,light)
 	draw_occlusion(self,light)
-	draw_shadow_map(self)
+	draw_shadow_map(self,light)
 	draw_light_map(self,light)
 	render.set_viewport(0, 0, render.get_window_width(), render.get_height())
 end
@@ -128,8 +126,9 @@ function M:handle_message(message_id,message)
 	if(message_id==add_light_hash)then
 		local light_constants = render.constant_buffer()
     	light_constants.resolution = vmath.vector4(self.light_size, self.light_size, 0, 0)
+  		light_constants.up_scale=vmath.vector4(message.scale,0,0,0)
    		light_constants.vColor = message.color
-		local light={position=message.position,size=message.size,color=message.color,const=light_constants}
+		local light={position=message.position,size=message.size,color=message.color,const=light_constants,scale=message.scale}
 		self.lights[message.light_id]=light
 	end
 end

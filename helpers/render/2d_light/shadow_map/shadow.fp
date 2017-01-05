@@ -11,9 +11,9 @@ varying mediump vec2 var_texcoord0;
 
 uniform lowp sampler2D TEX0;
 uniform vec4 resolution;
+uniform vec4 up_scale;
 const float THRESHOLD = 0.75;
 //for debugging; use a constant value in final release
-const float upScale=2;
 
 
 void main(void) {
@@ -32,7 +32,7 @@ void main(void) {
 		vec4 data = texture2D(TEX0, coord);
 		
 		//the current distance is how far from the top we've come
-		float dst = y/resolution.y / upScale;
+		float dst = y/resolution.y / up_scale.x;
 		
 		//if we've hit an opaque fragment (occluder), then get new distance
 		//if the new distance is below the current, then we'll use that for our ray

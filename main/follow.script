@@ -1,6 +1,7 @@
 function init(self)
   msg.post(".", "acquire_input_focus")
   self.mpos_vec = vmath.vector3(0, 0, 0)
+  msg.post("@system:", "toggle_profile")
 end
 
 local touch_hash=hash("touch")
