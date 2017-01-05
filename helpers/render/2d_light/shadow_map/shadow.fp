@@ -19,30 +19,22 @@ const float mult_pi=PI*1.5;
 
 void main(void) {
   float distance = 1.0;
-  for (float y=0.0; y<resolution.y; y+=1.0) {
-    	//rectangular to polar filter
-		vec2 norm = vec2(var_texcoord0.s, y/resolution.y) * 2.0 - 1.0;
-		float theta = mult_pi + norm.x * PI; 
-		//(1.0 + norm.y) * 0.5;//use MAD
-		float r =norm.y*0.5 + 0.5;
-		
-		
-		//coord which we will sample from occlude map
-		vec2 coord = vec2(-r * sin(theta), -r * cos(theta))*0.5 + 0.5;
-		
-		//sample the occlusion map
-		vec4 data = texture2D(TEX0, coord);
-		
-		
-		
-		//if we've hit an opaque fragment (occluder), then get new distance
-		//if the new distance is below the current, then we'll use that for our ray
-		if (data.a > THRESHOLD) {
-			//the current distance is how far from the top we've come
-			float dst = y/resolution.y / up_scale.x;
-			distance = min(distance, dst);
-			break;
-  		}
+  //angle do not changed for one ray, changed only r(lenght)
+  float theta = mult_pi + (var_texcoord0.s*2.0 -1.0) * PI; 
+  float add = 1.0/resolution.y;
+  vec2 pre_coord = vec2(sin(theta),cos(theta)) * 0.5;
+  for (float r=0.0; r<1.0; r+=add) {
+  	//coord which we will sample from occlude map
+	vec2 coord = pre_coord * -r +0.5;
+	//sample the occlusion map
+	vec4 data = texture2D(TEX0, coord);
+	//if we've hit an opaque fragment (occluder), then get new distance
+	//if the new distance is below the current, then we'll use that for our ray
+	if (data.a > THRESHOLD) {
+		//the current distance is how far from the top we've come
+		distance = r / up_scale.x;
+		break;
+  	}
   } 
   gl_FragColor = vec4(vec3(distance), 1.0);
 }

@@ -3,8 +3,8 @@ instances {
   id: "point_light"
   prototype: "/helpers/render/2d_light/point_light/point_light.go"
   position {
-    x: 250.0
-    y: 425.0
+    x: 0.0
+    y: 0.0
     z: 0.0
   }
   rotation {
