@@ -13,31 +13,33 @@ uniform lowp sampler2D TEX0;
 uniform vec4 resolution;
 uniform vec4 up_scale;
 const float THRESHOLD = 0.75;
+const float mult_pi=PI*1.5;
 //for debugging; use a constant value in final release
 
 
 void main(void) {
   float distance = 1.0;
-  
-  for (float y=0.0; y<256.0; y+=1.0) {
+  for (float y=0.0; y<resolution.y; y+=1.0) {
     	//rectangular to polar filter
 		vec2 norm = vec2(var_texcoord0.s, y/resolution.y) * 2.0 - 1.0;
-		float theta = PI*1.5 + norm.x * PI; 
-		float r = (1.0 + norm.y) * 0.5;
+		float theta = mult_pi + norm.x * PI; 
+		//(1.0 + norm.y) * 0.5;//use MAD
+		float r =norm.y*0.5 + 0.5;
+		
 		
 		//coord which we will sample from occlude map
-		vec2 coord = vec2(-r * sin(theta), -r * cos(theta))/2.0 + 0.5;
+		vec2 coord = vec2(-r * sin(theta), -r * cos(theta))*0.5 + 0.5;
 		
 		//sample the occlusion map
 		vec4 data = texture2D(TEX0, coord);
 		
-		//the current distance is how far from the top we've come
-		float dst = y/resolution.y / up_scale.x;
+		
 		
 		//if we've hit an opaque fragment (occluder), then get new distance
 		//if the new distance is below the current, then we'll use that for our ray
-		float caster = data.a;
-		if (caster > THRESHOLD) {
+		if (data.a > THRESHOLD) {
+			//the current distance is how far from the top we've come
+			float dst = y/resolution.y / up_scale.x;
 			distance = min(distance, dst);
 			break;
   		}
