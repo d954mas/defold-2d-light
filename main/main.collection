@@ -1,38 +1,5 @@
 name: "main"
 instances {
-  id: "point_light"
-  prototype: "/helpers/render/2d_light/point_light/point_light.go"
-  position {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-  }
-  rotation {
-    x: 0.0
-    y: 0.0
-    z: 0.0
-    w: 1.0
-  }
-  component_properties {
-    id: "script"
-    properties {
-      id: "size"
-      value: "512.0"
-      type: PROPERTY_TYPE_NUMBER
-    }
-    properties {
-      id: "light_id"
-      value: "-1.0"
-      type: PROPERTY_TYPE_NUMBER
-    }
-  }
-  scale3 {
-    x: 1.0
-    y: 1.0
-    z: 1.0
-  }
-}
-instances {
   id: "screen_helper"
   prototype: "/helpers/render/screen/screen_helper.go"
   position {

@@ -13,6 +13,7 @@ varying mediump vec2 var_texcoord0;
 uniform lowp sampler2D TEX0;
 uniform vec4 resolution;
 uniform vec4 up_scale;
+uniform vec4 pos;
 float mult_pi=PI*1.5;
 
 void main(void) {
@@ -20,10 +21,10 @@ void main(void) {
   //angle do not changed for one ray, changed only r(lenght)
   float theta = mult_pi + (var_texcoord0.s*2.0 -1.0) * PI; 
   float add = 1.0/resolution.y;
-  vec2 pre_coord = vec2(sin(theta),cos(theta)) * 0.5;
+  vec2 pre_coord = vec2(sin(theta)*128.0/pos.z,cos(theta)*128.0/pos.w);
   for (float r=0.0; r<1.0; r+=add) {
   	//coord which we will sample from occlude map
-	vec2 coord = pre_coord * -r +0.5;
+	vec2 coord = pre_coord * -r +vec2((pos.x)/pos.z,pos.y/pos.w);
 	vec4 data = texture2D(TEX0, coord);
 	//distance=min(distance,mix(1.0,r,step(THRESHOLD,data.a)));
 	//if we've hit an opaque fragment (occluder), then get new distance
