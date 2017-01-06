@@ -24,8 +24,8 @@ const float i_steps=2.0;
 void main(void) {
   float distance = 1.0;
   //angle do not changed for one ray, changed only r(lenght)
-  vec2 step = up_scale.y * vec2(sin(theta),cos(theta))*pre_calc_pos.zw;
-  vec2 start_position=vec2(pre_calc_pos.x,pre_calc_pos.y);
+  mediump vec2 step = up_scale.y * vec2(sin(theta),cos(theta))*pre_calc_pos.zw;
+  mediump vec2 start_position=vec2(pre_calc_pos.x,pre_calc_pos.y);
   //i think there are at least two untransparent pixels in line
   for(float i=0.0;i<resolution;i+=i_steps){
   	vec4 data = texture2D(TEX0, start_position);

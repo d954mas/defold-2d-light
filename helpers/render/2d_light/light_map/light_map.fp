@@ -13,6 +13,8 @@ varying mediump vec2 var_texcoord0;
 //uniform values
 uniform lowp sampler2D TEX0;
 uniform lowp sampler2D TEX1;
+uniform vec4 shadow_pos;
+
 const float resolution=256.0;
 uniform vec4 vColor;
 const float soft_shadows=1.0;
@@ -32,7 +34,7 @@ void main(void) {
 	
 	//the tex coord to sample our 1D lookup texture	
 	//always 0.0 on y axis
-	vec2 tc = vec2(coord, 0.0);
+	vec2 tc = vec2(coord, shadow_pos.x);
 	
 	//the center tex coord, which gives us hard shadows
 	float center = sample(vec2(tc.x, tc.y), r);        

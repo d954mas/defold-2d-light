@@ -6,7 +6,7 @@ local add_light_hash=hash("add_light")
 local M = {}
 M.__index = M
 
-local lights_in_row=32;
+local lights_in_row=10;
 
 
 local function init_render_targets(self,size)
@@ -52,6 +52,7 @@ end
 
 
 local function enable_blend(self)
+	render.enable_state(render.STATE_BLEND)
 	if(self.additive) then
     	render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE)
     else
@@ -59,13 +60,7 @@ local function enable_blend(self)
 	end
 end
 
-local function disable_blend(self)
-	if(self.additive) then
-    	render.set_blend_func(render.BLEND_SRC_ALPHA, render.BLEND_ONE_MINUS_SRC_ALPHA)
-    end
-end
-
--- use one big occlusion_target
+--maybe use one big occlusion_target
 local function draw_occlusion(self,light)
 	render.enable_render_target(self.occlusion_map_target)
 	render.clear({[render.BUFFER_COLOR_BIT] = self.clear_color, [render.BUFFER_DEPTH_BIT] = 1, [render.BUFFER_STENCIL_BIT] = 0})
@@ -99,9 +94,11 @@ local function disable_draw_lights(self)
 end
 
 local function draw_shadow_map(self,light)
+	enable_draw_shadows(self)
 	render.set_viewport(0, #self.drawn_shadows, self.light_size, 1)
 	render.draw(self.pred,light.const)
-	--self.screen_helper:draw_in(self.shadow_map_target,600,0,256,256)
+	disable_draw_shadows(self)
+	self.screen_helper:draw_in(self.shadow_map_target,600,0,256,256)
 end
 
 local function draw_light_map(self,light)
@@ -109,26 +106,29 @@ local function draw_light_map(self,light)
 	local height=render.get_height()
 	local width_scale = width/self.light_size/light.scale
 	local height_scale = height/self.light_size/light.scale
-	render.set_viewport(0, 0, render.get_window_width(), render.get_height())
 	local x=0.01 * width_scale-light.position.x/width*0.02*width_scale + 0.01
 	local y=0.01 * height_scale-light.position.y/height*0.02*height_scale + 0.01
-
+	
 	local projection=vmath.matrix4_orthographic(x-0.01*width_scale,x+0.01*width_scale,y-0.01*height_scale,y+0.01*height_scale,-1,1)
 	render.set_projection(projection)
+	render.set_viewport(0,0,render.get_width(),render.get_height())
+	
+	render.enable_material("light_map")
+	render.enable_texture(0, self.shadow_map_target, render.BUFFER_COLOR_BIT)
 
 	render.draw(self.pred,light.const)
+	render.disable_texture(0,self.shadow_map_target)
+	render.disable_material("light_map")
 end
 
 local function flush_lights(self)
 	disable_draw_shadows(self)
-	enable_draw_lights(self)
-	enable_blend(self)	
+	--enable_draw_lights(self)
 	for i,light in pairs(self.drawn_shadows) do
 		draw_light_map(self,light)
 	end
-	disable_blend(self)	
-	disable_draw_lights(self)
-	enable_draw_shadows(self)
+	--disable_draw_lights(self)
+	--enable_draw_shadows(self)
 	self.drawn_shadows={}
 end
 
