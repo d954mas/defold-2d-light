@@ -1,5 +1,5 @@
 name: "1d"
-vertex_program: "/helpers/render/shaders/default.vp"
+vertex_program: "/helpers/render/2d_light/shadow_map/shadow.vp"
 fragment_program: "/helpers/render/2d_light/shadow_map/shadow.fp"
 vertex_constants {
   name: "view_proj"
