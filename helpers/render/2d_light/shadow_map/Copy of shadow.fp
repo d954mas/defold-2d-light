@@ -26,7 +26,7 @@ void main(void) {
   vec2 pre_coord = vec2(sin(theta)*pre_something.x,cos(theta)*pre_something.y);
   vec2 step = add * pre_coord;
   vec2 coord = vec2(0.0);
-  vec2 start_position=vec2(pos.x/pos.z,pos.y/pos.w);
+  vec2 start_position=vec2(pos.x,pos.y);
   const float nsteps = resolution;
   for(float i=0.0;i<resolution;i++){
   	vec4 data = texture2D(TEX0, start_position - coord);

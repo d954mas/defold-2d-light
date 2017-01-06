@@ -18,8 +18,7 @@ local function init_render_targets(self,size)
 		v_wrap = render.WRAP_CLAMP_TO_EDGE }
 
 	self.occlusion_map_target=render.render_target("occlusion_map_target", {[render.BUFFER_COLOR_BIT] = color_params})
-	self.light_map_target=render.render_target("light_map_target", {[render.BUFFER_COLOR_BIT] = color_params})
-
+	
 	local shadow_color_params = {
     format = render.FORMAT_RGB,
   	width = size,
@@ -107,7 +106,6 @@ end
 local function draw_light(self,light)
 	draw_shadow_map(self,light)
 	draw_light_map(self,light)
-	render.set_viewport(0, 0, render.get_window_width(), render.get_height())
 end
 
 function M:draw()
@@ -122,9 +120,10 @@ function M:handle_message(message_id,message)
 	if(message_id==add_light_hash)then
 		local light_constants = render.constant_buffer()
     	light_constants.resolution = vmath.vector4(self.light_size, self.light_size, 0, 0)
-  		light_constants.up_scale=vmath.vector4(message.scale,0,0,0)
+  		light_constants.up_scale=vmath.vector4(1/message.scale,1.0/self.light_size,0,0)
    		light_constants.vColor = message.color
-   		light_constants.pos=vmath.vector4(message.position.x,message.position.y,render.get_width(),render.get_height())
+   		light_constants.pre_calc_pos=vmath.vector4(message.position.x/render.get_width(),message.position.y/render.get_height(),
+   			self.light_size/2/render.get_width(),self.light_size/2/render.get_height())
 		local light={position=message.position,size=message.size,color=message.color,const=light_constants,scale=message.scale}
 		self.lights[message.light_id]=light
 	end
