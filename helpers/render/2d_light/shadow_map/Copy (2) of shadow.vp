@@ -1,0 +1,14 @@
+uniform mediump mat4 view_proj;
+
+attribute mediump vec4 position;
+attribute mediump vec2 texcoord0;
+
+varying mediump vec2 var_texcoord0;
+varying mediump float theta;
+
+void main(){
+    gl_Position = view_proj * vec4(position.xyz, 1.0);
+    var_texcoord0 = texcoord0;
+    theta=(var_texcoord0.s - 0.5) * 6.283 + 4.71225; // *2PI + 1.5*PI
+    
+}

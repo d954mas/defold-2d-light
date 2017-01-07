@@ -26,9 +26,10 @@ void main(void) {
   //angle do not changed for one ray, changed only r(lenght)
   mediump vec2 step = up_scale.y * vec2(sin(theta),cos(theta))*pre_calc_pos.zw;
   mediump vec2 start_position=vec2(pre_calc_pos.x,pre_calc_pos.y);
+  vec2 coord=vec2(0);
   //i think there are at least two untransparent pixels in line
   for(float i=0.0;i<resolution;i+=i_steps){
-  	vec4 data = texture2D(TEX0, start_position);
+  	vec4 data = texture2D(TEX0, start_position-coord);
 	//if we've hit an opaque fragment (occluder), then get new distance
 	if (data.a > THRESHOLD) {
 		//check prev pixels
@@ -43,7 +44,7 @@ void main(void) {
 		distance = up_scale.y*(i-delta_i);
 		break;
   	}
-  	start_position-=step*i_steps;
+  	coord+=step*i_steps;
   }
   gl_FragColor = vec4(vec3(distance*up_scale.x), 1.0);
 }
